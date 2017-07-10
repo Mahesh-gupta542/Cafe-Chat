@@ -12,9 +12,11 @@
 <nav class="navbar">
 <ul>
   <li><a class="active" style="font-family: cursive;"  href="#home">Cafe-Chat</a></li>
-  <li style="float:right; font-size: -webkit-xxx-large;"><a href="#about">Login</a></li>
+  <li style="float:right; font-size: -webkit-xxx-large;"><a href="#about">Logout</a></li>
 </ul>
 </nav>
+
+Welcome <%= session.getAttribute("username") %>
 
 </body>
 </html>

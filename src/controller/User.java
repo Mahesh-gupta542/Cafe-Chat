@@ -2,7 +2,6 @@ package controller;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import dao.DemoDao;
@@ -51,10 +50,30 @@ public class User extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		DemoDao daobj = new DemoDao();
+		HashMap<String, String> user = new HashMap<>();
 		HttpSession session=request.getSession();
 		try{
-			  if (request.getParameter("create").equalsIgnoreCase("Create My Account")){
-				HashMap<String, String> user = new HashMap<>();
+			if (request.getParameter("create").equalsIgnoreCase("login")){
+				System.out.println("in ogin post");
+				user=daobj.userLogin(request.getParameter("email"));
+				if (user.get("UserExist")=="1" && user.get("UserPassword").equals(request.getParameter("password"))){
+					session.setAttribute("username", user.get("UserFname"));
+					session.setAttribute("userId", request.getParameter("email"));
+					RequestDispatcher rd=request.getRequestDispatcher("home.jsp");  
+					rd.include(request, response);					
+				}else if(user.get("UserExist")=="1" && !user.get("UserPassword").equals(request.getParameter("password"))){
+					PrintWriter out=response.getWriter();
+					out.print("Invalid Password");
+				}
+				else if(user.get("UserExist")=="0"){
+					PrintWriter out=response.getWriter();
+					out.print("Invalid Emailid");
+				}
+				
+			}
+			
+			if (request.getParameter("create").equalsIgnoreCase("Create My Account")){
+				
 				user.put("fname", request.getParameter("first_name"));
 				user.put("lname", request.getParameter("last_name"));
 				user.put("email", request.getParameter("email"));
@@ -69,8 +88,6 @@ public class User extends HttpServlet {
 				if(saveDetails==true){
 					session.setAttribute("username", request.getParameter("first_name"));
 					session.setAttribute("userId", request.getParameter("email"));
-					PrintWriter out=response.getWriter();
-					out.print("Welcome " + request.getParameter("first_name"));
 					RequestDispatcher rd=request.getRequestDispatcher("home.jsp");  
 					rd.include(request, response);
 				}else

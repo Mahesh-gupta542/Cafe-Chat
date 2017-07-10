@@ -2,6 +2,7 @@ package dao;
 
 import java.io.FileInputStream;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.util.HashMap;
@@ -35,6 +36,37 @@ public class DemoDao {
 			return false;
 		}
 		return true;
+	}
+	
+	public HashMap<String,String> userLogin(String username) throws Exception{
+		HashMap<String,String> userDetails = new HashMap<>();
+		String db_password="####";
+		String db_user_fname="";
+		try{
+		connection=Dbconnector.makeConnection();
+		queryString="Select first_name, password from cafe_chat.cafe_chat_user_details where user_email= ?";
+		statement=connection.prepareStatement(queryString);
+		statement.setString(1, username);
+		resultset=statement.executeQuery();
+		while (resultset.next()){
+			db_password=resultset.getString(2);
+			db_user_fname=resultset.getString(1);			
+		}
+		resultset.close();
+		if(db_password=="####"){
+			userDetails.put("UserExist", "0");
+		}else{
+			userDetails.put("UserExist", "1");
+			userDetails.put("UserPassword", db_password);
+			userDetails.put("UserFname", db_user_fname); 
+		}
+		Dbconnector.close(connection);
+		}catch(Exception e){
+			e.printStackTrace();
+			Dbconnector.close(connection);
+		}
+		System.out.println(userDetails.toString());
+		return userDetails;
 	}
 
 }
